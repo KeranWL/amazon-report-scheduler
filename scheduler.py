@@ -4,7 +4,7 @@ import ssl
 from datetime import date
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import anthropic
+from openai import OpenAI
 
 # --- 1. 调度逻辑 ---
 def get_report_type():
@@ -23,15 +23,15 @@ def get_report_type():
     return None, None
 
 
-# --- 2. 调用 Claude 生成内容 ---
+# --- 2. 调用 OpenAI ---
 def generate_report_content(report_title, prompt):
     print(f"正在生成报告: {report_title}")
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        raise Exception("缺少 ANTHROPIC_API_KEY")
+        raise Exception("缺少 OPENAI_API_KEY")
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = OpenAI(api_key=api_key)
 
     full_prompt = f"""
 你是一名资深亚马逊美国站运营分析师。
@@ -48,16 +48,13 @@ def generate_report_content(report_title, prompt):
 {prompt}
 """
 
-    response = client.messages.create(
-        model="claude-3-haiku",   # ✅ 关键修正：必须用这个
-        max_tokens=2000,
-        temperature=0.3,
-        messages=[
-            {"role": "user", "content": full_prompt}
-        ]
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": full_prompt}],
+        temperature=0.3
     )
 
-    content = response.content[0].text
+    content = response.choices[0].message.content
     print("报告生成完成")
     return content
 
