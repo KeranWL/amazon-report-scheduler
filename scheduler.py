@@ -22,6 +22,7 @@ def get_report_type():
 
     return None, None
 
+
 # --- 2. 调用 Claude 生成内容 ---
 def generate_report_content(report_title, prompt):
     print(f"正在生成报告: {report_title}")
@@ -48,15 +49,18 @@ def generate_report_content(report_title, prompt):
 """
 
     response = client.messages.create(
-        model="claude-3-haiku-20240307",
+        model="claude-3-haiku",   # ✅ 关键修正：必须用这个
         max_tokens=2000,
         temperature=0.3,
-        messages=[{"role": "user", "content": full_prompt}]
+        messages=[
+            {"role": "user", "content": full_prompt}
+        ]
     )
 
     content = response.content[0].text
     print("报告生成完成")
     return content
+
 
 # --- 3. 邮件发送 ---
 def send_email(report_title, report_content):
@@ -96,6 +100,7 @@ def send_email(report_title, report_content):
     except Exception as e:
         print(f"邮件发送失败: {e}")
         return False
+
 
 # --- 主执行 ---
 if __name__ == "__main__":
