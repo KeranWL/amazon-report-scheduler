@@ -48,7 +48,7 @@ def generate_report_content(report_title, prompt):
 """
 
     response = client.messages.create(
-        model="claude-3-5-sonnet-latest",
+        model="claude-3-sonnet-20240229",
         max_tokens=2000,
         temperature=0.3,
         messages=[{"role": "user", "content": full_prompt}]
