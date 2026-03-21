@@ -1,0 +1,40 @@
+name: Amazon Report Scheduler
+
+on:
+  # 每天北京时间早上 8 点执行一次
+  # cron 表达式使用 UTC 时间，'0 0 * * *' 对应 UTC 时间 00:00，即北京时间 08:00
+  schedule:
+    - cron: '0 0 * * *'
+  
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # 3. 安装依赖 (如果需要，例如 requests 库)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # pip install requests # 如果您使用 requests 调用 LLM API，请取消此行注释
+
+      # 4. 执行调度脚本
+      - name: Run scheduler script
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }} # LLM 的 API Key
+        run: python scheduler.py
