@@ -1,10 +1,12 @@
 import os
 import smtplib
 import ssl
+import json
 from datetime import date
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from openai import OpenAI
+
 
 # --- 1. 调度逻辑 ---
 def get_report_type():
@@ -23,7 +25,13 @@ def get_report_type():
     return None, None
 
 
-# --- 2. 调用 OpenAI ---
+# --- 2. 读取信源配置 ---
+def load_sources():
+    with open("sources.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+# --- 3. 生成报告（OpenAI + 信源控制） ---
 def generate_report_content(report_title, prompt):
     print(f"正在生成报告: {report_title}")
 
@@ -33,18 +41,43 @@ def generate_report_content(report_title, prompt):
 
     client = OpenAI(api_key=api_key)
 
+    # 读取信源
+    sources = load_sources()
+
+    core_sources = "\n".join([f"- {s['name']}: {s['url']}" for s in sources["core_sources"]])
+    industry_sources = "\n".join([f"- {s['name']}: {s['url']}" for s in sources["industry_sources"]])
+    ai_topics = "\n".join([f"- {t}" for t in sources["ai_search_topics"]])
+
+    # 构建 Prompt（核心升级点）
     full_prompt = f"""
 你是一名资深亚马逊美国站运营分析师。
 
-请生成报告：
-标题：《{report_title}》
+请基于以下信源进行信息整合：
 
-要求：
-- 中文输出
-- 结构清晰
-- 包含：核心概述 / 重点变化 / 影响 / 建议
+【核心信源（最高优先级）】
+{core_sources}
 
-内容：
+【行业信源】
+{industry_sources}
+
+【补充搜索方向】
+{ai_topics}
+
+任务：
+生成《{report_title}》
+
+要求（必须严格遵守）：
+- 只输出最重要的 2-3 条信息
+- 每条信息结构如下：
+  1️⃣ 发生了什么（1句话）
+  2️⃣ 影响（1句话）
+  3️⃣ 动作（1句话）
+
+- 不要长分析
+- 不要背景介绍
+- 不要废话
+
+内容范围：
 {prompt}
 """
 
@@ -59,7 +92,7 @@ def generate_report_content(report_title, prompt):
     return content
 
 
-# --- 3. 邮件发送 ---
+# --- 4. 邮件发送 ---
 def send_email(report_title, report_content):
     sender_email = os.environ.get("EMAIL_USER")
     receiver_email = os.environ.get("EMAIL_TO")
@@ -80,7 +113,7 @@ def send_email(report_title, report_content):
         <h2>{report_title}</h2>
         <p>日期：{date.today().strftime('%Y-%m-%d')}</p>
         <hr>
-        <pre style="white-space: pre-wrap;">{report_content}</pre>
+        <pre style="white-space: pre-wrap; font-size:14px;">{report_content}</pre>
       </body>
     </html>
     """
