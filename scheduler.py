@@ -6,7 +6,8 @@ from datetime import date
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from openai import OpenAI
-
+import requests
+from bs4 import BeautifulSoup
 
 # --- 1. 调度逻辑 ---
 def get_report_type():
