@@ -1,0 +1,56 @@
+{
+  "core_sources": [
+    {
+      "name": "Amazon Seller Central Announcements",
+      "type": "official",
+      "url": "https://sellercentral.amazon.com/gp/help/external/news.html"
+    },
+    {
+      "name": "Amazon Ads Blog",
+      "type": "official",
+      "url": "https://advertising.amazon.com/en-us/resources/whats-new"
+    },
+    {
+      "name": "Amazon Investor Relations",
+      "type": "official",
+      "url": "https://ir.aboutamazon.com/"
+    },
+    {
+      "name": "Amazon News",
+      "type": "official",
+      "url": "https://www.aboutamazon.com/news"
+    },
+    {
+      "name": "Marketplace Pulse",
+      "type": "analysis",
+      "url": "https://www.marketplacepulse.com/"
+    }
+  ],
+  "industry_sources": [
+    {
+      "name": "Retail Dive",
+      "url": "https://www.retaildive.com/"
+    },
+    {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/"
+    },
+    {
+      "name": "Cifnews",
+      "url": "https://www.cifnews.com/"
+    },
+    {
+      "name": "Adweek",
+      "url": "https://www.adweek.com/"
+    }
+  ],
+  "ai_search_topics": [
+    "Amazon seller policy update 2026",
+    "Amazon FBA fee changes",
+    "Amazon advertising updates",
+    "TikTok Shop US expansion",
+    "Temu US strategy",
+    "ecommerce AI trends",
+    "consumer behavior ecommerce US"
+  ]
+}
