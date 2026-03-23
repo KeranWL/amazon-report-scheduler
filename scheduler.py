@@ -2,12 +2,13 @@ import os
 import smtplib
 import ssl
 import json
+import requests
+from bs4 import BeautifulSoup
 from datetime import date
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from openai import OpenAI
-import requests
-from bs4 import BeautifulSoup
+
 
 # --- 1. 调度逻辑 ---
 def get_report_type():
@@ -30,6 +31,24 @@ def get_report_type():
 def load_sources():
     with open("sources.json", "r", encoding="utf-8") as f:
         return json.load(f)
+def fetch_website_content(url):
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0"
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # 提取纯文本
+        text = soup.get_text(separator="\n", strip=True)
+
+        # 限制长度（防止太长）
+        return text[:3000]
+
+    except Exception as e:
+        print(f"抓取失败: {url} - {e}")
+        return ""
 
 
 # --- 3. 生成报告（OpenAI + 信源控制） ---
